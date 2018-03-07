@@ -1,12 +1,12 @@
-# throttler
-
+# throttler  ![Project status](https://img.shields.io/badge/version-0.0.1-green.svg)  [(https://img.shields.io/badge/dependencies-none-green.svg)] ![License](https://img.shields.io/dub/l/vibe-d.svg)
+[![GoDoc](https://godoc.org/github.com/centraldereservas/throttler?status.svg)](https://godoc.org/github.com/centraldereservas/throttler)
 Provides a throttle request channel for Go that controls request rate limit in order to prevent exceeding a predefined API quota.
 
 
 ## Installation
 
 ```sh
-go get -u bitbucket.org/cdr-danielgil/throttler
+go get -u github.com/centraldereservas/throttler
 ```
 
 ## Motivation
@@ -156,28 +156,28 @@ $ go run ./example/main.go
 Throttler started
 10 request(s) pending to be processed at Rate = (1 call / 550ms).
 
-[2018-02-14 08:34:16.540434 +0100 CET m=+0.551561077] got ticket; Fulfilling Request [Task 0]
-[2018-02-14 08:34:16.541076 +0100 CET m=+0.552204278] Request fulfilled [Task 0]
-[2018-02-14 08:34:17.092734 +0100 CET m=+1.103889840] got ticket; Fulfilling Request [Task 1]
-[2018-02-14 08:34:17.092874 +0100 CET m=+1.104030095] Request fulfilled [Task 1]
-[2018-02-14 08:34:17.642794 +0100 CET m=+1.653978019] got ticket; Fulfilling Request [Task 9]
-[2018-02-14 08:34:17.642918 +0100 CET m=+1.654101990] Request fulfilled [Task 9]
-[2018-02-14 08:34:18.193137 +0100 CET m=+2.204348959] got ticket; Fulfilling Request [Task 2]
-[2018-02-14 08:34:18.193214 +0100 CET m=+2.204425654] Request fulfilled [Task 2]
-[2018-02-14 08:34:18.739966 +0100 CET m=+2.751206224] got ticket; Fulfilling Request [Task 5]
-[2018-02-14 08:34:18.740035 +0100 CET m=+2.751275318] Request fulfilled [Task 5]
-[2018-02-14 08:34:19.29534 +0100 CET m=+3.306607420] got ticket; Fulfilling Request [Task 3]
-[2018-02-14 08:34:19.295405 +0100 CET m=+3.306673507] Request fulfilled [Task 3]
-[2018-02-14 08:34:19.842653 +0100 CET m=+3.853949471] got ticket; Fulfilling Request [Task 6]
-[2018-02-14 08:34:19.842755 +0100 CET m=+3.854050567] Request fulfilled [Task 6]
-[2018-02-14 08:34:20.395302 +0100 CET m=+4.406625795] got ticket; Fulfilling Request [Task 4]
-[2018-02-14 08:34:20.395364 +0100 CET m=+4.406688232] Request fulfilled [Task 4]
-[2018-02-14 08:34:20.943651 +0100 CET m=+4.955003116] got ticket; Fulfilling Request [Task 7]
-[2018-02-14 08:34:20.94371 +0100 CET m=+4.955062235] Request fulfilled [Task 7]
-[2018-02-14 08:34:21.492474 +0100 CET m=+5.503854301] got ticket; Fulfilling Request [Task 8]
-[2018-02-14 08:34:21.492548 +0100 CET m=+5.503927745] Request fulfilled [Task 8]
+[2018-03-06 13:00:30.967604035 +0100 CET m=+0.551395838] got ticket; Fulfilling Request [Task 0]
+[2018-03-06 13:00:30.96785047 +0100 CET m=+0.551642269] Request fulfilled [Task 0]
+[2018-03-06 13:00:31.517842672 +0100 CET m=+1.101625282] got ticket; Fulfilling Request [Task 4]
+[2018-03-06 13:00:31.517905978 +0100 CET m=+1.101688587] Request fulfilled [Task 4]
+[2018-03-06 13:00:32.068228166 +0100 CET m=+1.652001580] got ticket; Fulfilling Request [Task 5]
+[2018-03-06 13:00:32.068318188 +0100 CET m=+1.652091601] Request fulfilled [Task 5]
+[2018-03-06 13:00:32.622813434 +0100 CET m=+2.206577582] got ticket; Fulfilling Request [Task 8]
+[2018-03-06 13:00:32.622871651 +0100 CET m=+2.206635798] Request fulfilled [Task 8]
+[2018-03-06 13:00:33.17302226 +0100 CET m=+2.756777215] got ticket; Fulfilling Request [Task 1]
+[2018-03-06 13:00:33.173082973 +0100 CET m=+2.756837927] Request fulfilled [Task 1]
+[2018-03-06 13:00:33.722459503 +0100 CET m=+3.306205278] got ticket; Fulfilling Request [Task 9]
+[2018-03-06 13:00:33.722519655 +0100 CET m=+3.306265429] Request fulfilled [Task 9]
+[2018-03-06 13:00:34.268568851 +0100 CET m=+3.852305502] got ticket; Fulfilling Request [Task 2]
+[2018-03-06 13:00:34.268632648 +0100 CET m=+3.852369298] Request fulfilled [Task 2]
+[2018-03-06 13:00:34.821718357 +0100 CET m=+4.405445766] got ticket; Fulfilling Request [Task 6]
+[2018-03-06 13:00:34.821782306 +0100 CET m=+4.405509714] Request fulfilled [Task 6]
+[2018-03-06 13:00:35.368385972 +0100 CET m=+4.952104247] got ticket; Fulfilling Request [Task 3]
+[2018-03-06 13:00:35.3684804 +0100 CET m=+4.952198674] Request fulfilled [Task 3]
+[2018-03-06 13:00:35.921699903 +0100 CET m=+5.505408934] got ticket; Fulfilling Request [Task 7]
+[2018-03-06 13:00:35.921761889 +0100 CET m=+5.505470919] Request fulfilled [Task 7]
 
-Elapsed time: 5.820121229s
+Elapsed time: 5.98493459s
 ```
 
 ## Tests
@@ -192,27 +192,13 @@ $ go test -v
 
 Output:
 ```sh
-$ go test -v
-=== RUN   TestNewHandler
-=== RUN   TestNewHandler/Positive_TC
-=== RUN   TestNewHandler/Negative_TC:_maxCallsPerSecond_zero
-=== RUN   TestNewHandler/Negative_TC:_maxCallsPerSecond
-=== RUN   TestNewHandler/Negative_TC:_guardTime
-=== RUN   TestNewHandler/Positive_TC:_guardTime_zero
-=== RUN   TestNewHandler/Negative_TC:_reqChanCapacity
---- PASS: TestNewHandler (0.00s)
-    --- PASS: TestNewHandler/Positive_TC (0.00s)
-    --- PASS: TestNewHandler/Negative_TC:_maxCallsPerSecond_zero (0.00s)
-    --- PASS: TestNewHandler/Negative_TC:_maxCallsPerSecond (0.00s)
-    --- PASS: TestNewHandler/Negative_TC:_guardTime (0.00s)
-    --- PASS: TestNewHandler/Positive_TC:_guardTime_zero (0.00s)
-    --- PASS: TestNewHandler/Negative_TC:_reqChanCapacity (0.00s)
-=== RUN   TestEnqueue
-=== RUN   TestEnqueue/Positive_TC
---- PASS: TestEnqueue (1.53s)
-    --- PASS: TestEnqueue/Positive_TC (1.53s)
+$ go test -race
+[2018-03-06 12:59:40.679745077 +0100 CET m=+0.557695321] got ticket; Fulfilling Request [Positive TC]
+[2018-03-06 12:59:40.680769778 +0100 CET m=+0.558720005] Request fulfilled [Positive TC]
 PASS
-ok      bitbucket.org/differenttravel/pase-common/throttler     1.547s
+[2018-03-06 12:59:41.967224308 +0100 CET m=+1.845153041] got ticket; Fulfilling Request [Negative TC: force timeout in Queue]
+[2018-03-06 12:59:41.967632159 +0100 CET m=+1.845560885] Request fulfilled [Negative TC: force timeout in Queue]
+ok      github.com/centraldereservas/throttler  2.313s
 ```
 
 
@@ -233,3 +219,6 @@ ok      bitbucket.org/differenttravel/pase-common/throttler     1.547s
 ## License
 
 This project is under the [MIT License][mit].
+
+[mit]: https://github.com/centraldereservas/throttler/blob/master/LICENSE
+[doc]: https://godoc.org/github.com/centraldereservas/throttler

@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"bitbucket.org/differenttravel/pase-common/throttler"
+	"github.com/centraldereservas/throttler"
 )
 
 var handler throttler.Handler

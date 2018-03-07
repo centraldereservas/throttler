@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/differenttravel/pase-common/throttler"
+	"github.com/centraldereservas/throttler"
 )
 
 var duration500ms = 500 * time.Millisecond
