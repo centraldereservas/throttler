@@ -1,4 +1,4 @@
-# throttler  ![Project status](https://img.shields.io/badge/version-0.0.1-green.svg)  ![Project dependencies](https://img.shields.io/badge/dependencies-none-green.svg) ![License](https://img.shields.io/dub/l/vibe-d.svg) [![GoDoc](https://godoc.org/github.com/centraldereservas/throttler?status.svg)](https://godoc.org/github.com/centraldereservas/throttler)
+# throttler  ![Project status](https://img.shields.io/badge/version-0.0.1-green.svg)  ![Project dependencies](https://img.shields.io/badge/dependencies-none-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![GoDoc](https://godoc.org/github.com/centraldereservas/throttler?status.svg)](https://godoc.org/github.com/centraldereservas/throttler)
 
 Provides a throttle request channel for Go that controls request rate limit in order to prevent exceeding a predefined API quota.
 
@@ -6,23 +6,23 @@ Provides a throttle request channel for Go that controls request rate limit in o
 ## Installation
 
 ```sh
-go get -u github.com/centraldereservas/throttler
+go get github.com/centraldereservas/throttler
 ```
 
 ## Motivation
  
 Why we need to control the request rate? 
-Because some API's limits the maximal number of calls that a client can request in order to control 
+Because some APIs limit the maximal number of calls that a client can request in order to control 
 the received traffic. If this rate limit is overtaken then the sender will receive an HTTP Error from the server, 
 for example a `403 Developer Over Rate`.
 
-To avoid this situation the throttler package uses a mechanism to regulate the request flow to the server based on the leaky bucket 
+To avoid this situation the `throttler` package uses a mechanism to regulate the request flow to the server based on the leaky bucket 
 algorithm where the bucket is represented by a buffered channel.
 
 
 ## Documentation
 
-The throttler package has 3 main components: `Rate`, `Handler` and `Queue`.
+The throttler package has the following main components: `Rate`, `Handler` and `Queue`.
 
 API documentation is available on [godoc.org][doc]. 
 
@@ -33,11 +33,11 @@ The `Rate` defines the limits to communicate with a server that can not be broke
 ```Rate Duration = period + guardTime```
 
 where `period` represents the frequency that we should send the requests and it is calculated by any 
-of the initializers `NewRateByCallsPerSec`, `NewRateByCallsPerMinute` or `NewRateByCallsPerHour` 
+of the rate initializers (`NewRateByCallsPerSec`, `NewRateByCallsPerMinute` or `NewRateByCallsPerHour`) 
 and `guardTime` is an extra time to wait beetween two consecutive calls.
 
 ### Handler
-The `Handler` is the responsible to start in a new goroutine a mechanism called `requestsHandler` which controls
+The `Handler` is the responsible to start a mechanism called `requestsHandler` in a new goroutine which controls
 that the requests are fulfilled at the proper time respecting the `Rate` limits.
 
 ### Queue
@@ -63,7 +63,7 @@ Then we create an instance of a throttler handler passing the rate:
 handler, err := throttler.NewHandler(rate, requestChannelCapacity, verbose)
 ```
 where `requestChannelCapacity` is the capacity of the channel that will contains all the queued requests and 
-`verbose` is a boolean that displays debug information in the standard output if`true`. 
+`verbose` is a boolean that displays debug information in the standard output if `true`. 
 
 Once we have an instance of the handler we can start the requests handler which will be listening for new requests
 from the requests channel:
@@ -78,7 +78,7 @@ res, err := handler.Queue(ctx, name, req, timeout)
 ```
 
 where `ctx` is the context (used for cancellation propagation), `name` is an optional field used just for verbose, 
-`req` of type `http.Request` is the request and `timeout` is the request timeout `time.Duration`.
+`req` is the request of type `http.Request` and `timeout` is the request timeout of type `time.Duration`.
 
 ### Concurrent Requests
 In some situations we need to send multiple calls in parallel and we would like to avoid blocking the thread, for this case
@@ -182,12 +182,18 @@ Elapsed time: 5.98493459s
 
 ## Tests
 
-The file `handler_test.go` contains some test cases for testing `NewHandler` and `Enqueue` functions.
+### handler_test
+The file `handler_test.go` contains some test cases for testing the functions `NewHandler`, `SetClient`, `StartRequestsHandler` and `Queue`.
+
+### rate_test
+The file rate_test.go contains some test cases for testing the rate functions: `NewRateByCallsPerSecond`, `NewRateByCallsPerMinute`, `NewRateByCallsPerHour` and `CalculateRate`.
+
+### Run all tests
 
 Use the following command to run all the tests:
 
 ```sh
-$ go test -v
+$ go test -v -race
 ```
 
 Output:
@@ -201,13 +207,9 @@ PASS
 ok      github.com/centraldereservas/throttler  2.313s
 ```
 
-
 ## Limitations
-- Not working when using multiple application instances running in different servers. Solution: a distributed rate limit control 
-  using a master/slave throttle where the master is the only one responsible for the leaky bucket time control.
-- The fulfillRequest function always calls `http.Client.Do(http.Request)` but the package could accept the function that has to be called 
-  in the `throttler.Request`. The problem is that the response channel (stored in the `throttler.Request`) will be unknown in compile time and
-  it could be different from call to call.
+- If we have multiple application instances could be possible to overtake the rate limit because the instances do not share the requests channel.
+- The fulfillRequest function always calls `http.Client.Do(http.Request)`.
 
 
 ## References
