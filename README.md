@@ -2,7 +2,6 @@
 
 Provides a throttle request channel for Go that controls request rate limit in order to prevent exceeding a predefined API quota.
 
-
 ## Installation
 
 ```sh
@@ -10,7 +9,7 @@ go get github.com/centraldereservas/throttler
 ```
 
 ## Motivation
- 
+
 Why we need to control the request rate? 
 Because some APIs limit the maximal number of calls that a client can request in order to control 
 the received traffic. If this rate limit is overtaken then the sender will receive an HTTP Error from the server, 
@@ -19,15 +18,14 @@ for example a `403 Developer Over Rate`.
 To avoid this situation the `throttler` package uses a mechanism to regulate the request flow to the server based on the leaky bucket 
 algorithm where the bucket is represented by a buffered channel.
 
-
 ## Documentation
 
 The throttler package has the following main components: `Rate`, `Handler` and `Queue`.
 
 API documentation is available on [godoc.org][doc]. 
 
-
 ### Rate
+
 The `Rate` defines the limits to communicate with a server that can not be broken. The rate duration is calculated as 
 
 ```Rate Duration = period + guardTime```
@@ -37,10 +35,12 @@ of the rate initializers (`NewRateByCallsPerSec`, `NewRateByCallsPerMinute` or `
 and `guardTime` is an extra time to wait beetween two consecutive calls.
 
 ### Handler
+
 The `Handler` is the responsible to start a mechanism called `requestsHandler` in a new goroutine which controls
 that the requests are fulfilled at the proper time respecting the `Rate` limits.
 
 ### Queue
+
 The `Queue` function queues a new `throttler.Request` (which contains an `http.Request`) to the shared 
 requests channel and blocks the thread until the `requestsHandler` decides that the request can be processed. 
 When this happens, the function `fulfillRequest` is called which internally calls the `http.Client.Do(http.Request)`. 
@@ -48,33 +48,45 @@ Finally the `Queue` function returns an `http.Response`.
 
 
 ## Usage
+
 To use this package the first thing we have to do is create a `Rate` using any of the available constructors:
+
 ```go
+
 rate, err := throttler.NewRateByCallsPerSec(maxCallsPerSecond, guardTime)
 rate, err := throttler.NewRateByCallsPerMinute(maxCallsPerMin, guardTime)
 rate, err := throttler.NewRateByCallsPerHour(maxCallsPerHour, guardTime)
+
 ```
+
 where `maxCallsPerSecond`, `maxCallsPerMin` and `maxCallsPerHour` are integers that define the maximal number of 
 requests allowed to send to the client, and `guardTime` is an extra time to wait beetween two consecutive calls.
 
 Then we create an instance of a throttler handler passing the rate:
 
 ```go
+
 handler, err := throttler.NewHandler(rate, requestChannelCapacity, verbose)
+
 ```
+
 where `requestChannelCapacity` is the capacity of the channel that will contains all the queued requests and 
 `verbose` is a boolean that displays debug information in the standard output if `true`. 
 
 Once we have an instance of the handler we can start the requests handler which will be listening for new requests
 from the requests channel:
 ```go
+
 handler.StartRequestsHandler()
+
 ```
 
 After this we can queue new requests to the channel:
 
 ```go
+
 res, err := handler.Queue(ctx, name, req, timeout)
+
 ```
 
 where `ctx` is the context (used for cancellation propagation), `name` is an optional field used just for verbose, 
@@ -85,13 +97,15 @@ In some situations we need to send multiple calls in parallel and we would like 
 we can achieve this by using goroutines. If we encapsulate the `Queue` call into a function like this:
 
 ```go
+
 func handleRequest(ctx context.Context, name string, req *http.Request, timeout time.Duration) *http.Response {
-	res, err := handler.Queue(ctx, name, req, timeout)
-	if err != nil {
-		log.Fatalf("unable to queue the request: %v", err)
-	}
-	return res
+    cres, err := handler.Queue(ctx, name, req, timeout)
+    if err != nil {
+        log.Fatalf("unable to queue the request: %v", err)
+    }
+    return res
 }
+
 ```
 
 then we could call the `handleRequest` in a new goroutine and send as many requests as we need.
@@ -99,40 +113,45 @@ Later we can wait for the responses using a select case statement which controls
 to stop waiting:
 
 ```go
+
 c := make(chan *http.Response)
 for i := 0; i < numRequests; i++ {
-	name := "Task " + strconv.Itoa(i)
-	go func() {
-		c <- handleRequest(ctx, name, req, reqTimeout)
-	}()
+    name := "Task " + strconv.Itoa(i)
+    go func() {
+        c <- handleRequest(ctx, name, req, reqTimeout)
+    }()
 }
 timeout := time.After(globalTimeout)
 for i := 0; i < numRequests; i++ {
-	select {
-	case result := <-c:
-		processResponse(i, result)
-	case <-timeout:
-		fmt.Printf("timed out")
-		return
-	}
+    select {
+    case result := <-c:
+        processResponse(i, result)
+    case <-timeout:
+        fmt.Printf("timed out")
+        return
+    }
 }
+
 ```
 
 ### Set http.Client
+
 By default the package sets the internal `http.Client` to the `DefaultClient` but sometimes it is desired to customize the client
 specifying timeouts, redirect policy, proxies or simply to be used with Google App Engine. We can set the `http.Client` by calling
 the function `SetClient(client *http.Client)` just before the `StartRequestsHandler()`.
 
 Example:
 ```go
+
 handler, err := throttler.NewHandler(rate, requestChannelCapacity, verbose)
 client := &http.Client{
-	Timeout:       10 * time.Second,
-	CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-	Transport:     &http.Transport{TLSHandshakeTimeout: 5 * time.Second},
+    Timeout:       10 * time.Second,
+    CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
+    Transport:     &http.Transport{TLSHandshakeTimeout: 5 * time.Second},
 }
 handler.SetClient(client)
 handler.StartRequestsHandler()
+
 ```
 
 ## Example
@@ -152,6 +171,7 @@ The `/example/main.go` file accepts the following flags:
 Output:
 
 ```sh
+
 $ go run ./example/main.go
 Throttler started
 10 request(s) pending to be processed at Rate = (1 call / 550ms).
@@ -178,14 +198,17 @@ Throttler started
 [2018-03-06 13:00:35.921761889 +0100 CET m=+5.505470919] Request fulfilled [Task 7]
 
 Elapsed time: 5.98493459s
+
 ```
 
 ## Tests
 
 ### handler_test
+
 The file `handler_test.go` contains some test cases for testing the functions `NewHandler`, `SetClient`, `StartRequestsHandler` and `Queue`.
 
 ### rate_test
+
 The file rate_test.go contains some test cases for testing the rate functions: `NewRateByCallsPerSecond`, `NewRateByCallsPerMinute`, `NewRateByCallsPerHour` and `CalculateRate`.
 
 ### Run all tests
@@ -193,11 +216,14 @@ The file rate_test.go contains some test cases for testing the rate functions: `
 Use the following command to run all the tests:
 
 ```sh
-$ go test -v -race
+
+go test -v -race
+
 ```
 
 Output:
 ```sh
+
 $ go test -race
 [2018-03-06 12:59:40.679745077 +0100 CET m=+0.557695321] got ticket; Fulfilling Request [Positive TC]
 [2018-03-06 12:59:40.680769778 +0100 CET m=+0.558720005] Request fulfilled [Positive TC]
@@ -205,16 +231,19 @@ PASS
 [2018-03-06 12:59:41.967224308 +0100 CET m=+1.845153041] got ticket; Fulfilling Request [Negative TC: force timeout in Queue]
 [2018-03-06 12:59:41.967632159 +0100 CET m=+1.845560885] Request fulfilled [Negative TC: force timeout in Queue]
 ok      github.com/centraldereservas/throttler  2.313s
+
 ```
 
 ## Limitations
+
 - If we have multiple application instances could be possible to overtake the rate limit because the instances do not share the requests channel.
 - The fulfillRequest function always calls `http.Client.Do(http.Request)`.
 
 
 ## References
-* [Rate Limiting](https://github.com/golang/go/wiki/RateLimiting).
-* [Rate Limiting Service Calls in Go](https://medium.com/@KevinHoffman/rate-limiting-service-calls-in-go-3771c6b7c146) by Kevin Hoffman.
+
+- [Rate Limiting](https://github.com/golang/go/wiki/RateLimiting).
+- [Rate Limiting Service Calls in Go](https://medium.com/@KevinHoffman/rate-limiting-service-calls-in-go-3771c6b7c146) by Kevin Hoffman.
 
 
 
