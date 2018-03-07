@@ -1,5 +1,4 @@
-# throttler  ![Project status](https://img.shields.io/badge/version-0.0.1-green.svg)  ![Project dependencies](https://img.shields.io/badge/dependencies-none-green.svg) ![License](https://img.shields.io/dub/l/vibe-d.svg)
-[![GoDoc](https://godoc.org/github.com/centraldereservas/throttler?status.svg)](https://godoc.org/github.com/centraldereservas/throttler)
+# throttler  ![Project status](https://img.shields.io/badge/version-0.0.1-green.svg)  ![Project dependencies](https://img.shields.io/badge/dependencies-none-green.svg) ![License](https://img.shields.io/dub/l/vibe-d.svg) [![GoDoc](https://godoc.org/github.com/centraldereservas/throttler?status.svg)](https://godoc.org/github.com/centraldereservas/throttler)
 
 Provides a throttle request channel for Go that controls request rate limit in order to prevent exceeding a predefined API quota.
 
