@@ -2,8 +2,8 @@ package throttler
 
 import "net/http"
 
-// Response is the response struct returned after fulfill the request.
+// Response contains the structure returned by the client handler which is finally inserted in the request.ResponseChannel in fulfill().
 type Response struct {
-	hres *http.Response
-	err  error
+	HRes *http.Response
+	Err  error
 }

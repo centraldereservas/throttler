@@ -13,7 +13,7 @@ import (
 	"github.com/centraldereservas/throttler"
 )
 
-var handler throttler.Handler
+var limiter throttler.Limiter
 
 func main() {
 	start := time.Now()
@@ -34,8 +34,8 @@ func main() {
 
 	fmt.Println("Throttler started")
 
-	// initialize the handler
-	handler = initHandler(*maxCallsPerSecond, guardTime, *reqChanCap, *verbose, globalTimeout)
+	// initialize the throttler
+	limiter = initHandler(*maxCallsPerSecond, guardTime, *reqChanCap, *verbose, globalTimeout)
 	req := createRequest()
 	ctx := context.Background()
 	c := make(chan *http.Response)
@@ -48,7 +48,7 @@ func main() {
 			c <- handleRequest(ctx, name, req, reqTimeout)
 		}()
 	}
-	fmt.Printf("%d request(s) pending to be processed at Rate = (1 call / %v).\n\n", *numRequests, handler.Rate())
+	fmt.Printf("%d request(s) pending to be processed at Rate = (1 call / %v).\n\n", *numRequests, limiter.Rate())
 
 	// Wait for receiving the responses from the channel and process each of them.
 	// If a time out occurs, break the for loop.
@@ -67,18 +67,18 @@ func main() {
 }
 
 // initHandler creates a new instance of a throttler.Handler
-func initHandler(maxCallsPerSecond int, guardTime time.Duration, requestChannelCapacity int, verbose bool, globalTimeoutInMs time.Duration) throttler.Handler {
+func initHandler(maxCallsPerSecond int, guardTime time.Duration, requestChannelCapacity int, verbose bool, globalTimeoutInMs time.Duration) throttler.Limiter {
 	rate, err := throttler.NewRateByCallsPerSecond(maxCallsPerSecond, guardTime)
 	if err != nil {
 		log.Fatalf("unable to create a rate: %v", err)
 	}
-	handler, err := throttler.NewHandler(rate, requestChannelCapacity, verbose)
-	if err != nil || handler == nil {
-		log.Fatalf("unable to create a new handler: %v", err)
+	client := &http.Client{Timeout: globalTimeoutInMs}
+	limiter, err := throttler.New(rate, requestChannelCapacity, verbose, client)
+	if err != nil || limiter == nil {
+		log.Fatalf("unable to create a new throttler: %v", err)
 	}
-	handler.SetClient(&http.Client{Timeout: globalTimeoutInMs})
-	handler.StartRequestsHandler()
-	return handler
+	limiter.Run()
+	return limiter
 }
 
 // createRequest creates a request to a test API to retrieve the current datetime
@@ -93,7 +93,7 @@ func createRequest() *http.Request {
 
 // handleRequest queues the http.Request to the handler requests channel
 func handleRequest(ctx context.Context, name string, req *http.Request, requestTimeout time.Duration) *http.Response {
-	res, err := handler.Queue(ctx, name, req, requestTimeout)
+	res, err := limiter.Queue(ctx, name, req, requestTimeout)
 	if err != nil {
 		log.Fatalf("unable to queue the request: %v", err)
 	}

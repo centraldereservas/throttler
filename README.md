@@ -22,7 +22,7 @@ algorithm where the bucket is represented by a buffered channel.
 
 The throttler package has the following main components: `Rate`, `Handler` and `Queue`.
 
-API documentation is available on [godoc.org][doc]. 
+API documentation is available on [godoc.org][doc].
 
 ### Rate
 
@@ -77,7 +77,7 @@ Once we have an instance of the handler we can start the requests handler which 
 from the requests channel:
 ```go
 
-handler.StartRequestsHandler()
+handler.Run()
 
 ```
 
@@ -138,7 +138,7 @@ for i := 0; i < numRequests; i++ {
 
 By default the package sets the internal `http.Client` to the `DefaultClient` but sometimes it is desired to customize the client
 specifying timeouts, redirect policy, proxies or simply to be used with Google App Engine. We can set the `http.Client` by calling
-the function `SetClient(client *http.Client)` just before the `StartRequestsHandler()`.
+the function `SetClient(client *http.Client)` just before the `Run()`.
 
 Example:
 ```go
@@ -150,7 +150,7 @@ client := &http.Client{
     Transport:     &http.Transport{TLSHandshakeTimeout: 5 * time.Second},
 }
 handler.SetClient(client)
-handler.StartRequestsHandler()
+handler.Run()
 
 ```
 
@@ -205,7 +205,7 @@ Elapsed time: 5.98493459s
 
 ### handler_test
 
-The file `handler_test.go` contains some test cases for testing the functions `NewHandler`, `SetClient`, `StartRequestsHandler` and `Queue`.
+The file `handler_test.go` contains some test cases for testing the functions `NewHandler`, `SetClient`, `Run` and `Queue`.
 
 ### rate_test
 
@@ -242,9 +242,9 @@ ok      github.com/centraldereservas/throttler  2.313s
 
 ## References
 
-- [Rate Limiting](https://github.com/golang/go/wiki/RateLimiting).
-- [Rate Limiting Service Calls in Go](https://medium.com/@KevinHoffman/rate-limiting-service-calls-in-go-3771c6b7c146) by Kevin Hoffman.
-
+- [Rate Limiting](https://github.com/golang/go/wiki/RateLimiting)
+- [Rate Limiting Service Calls in Go](https://medium.com/@KevinHoffman/rate-limiting-service-calls-in-go-3771c6b7c146) by Kevin Hoffman
+- [Mocking in Go (dotGo 2014)](https://youtu.be/2_FMbcQJg0c) by Gabriel Aszalos
 
 
 ## License
