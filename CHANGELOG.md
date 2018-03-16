@@ -1,5 +1,8 @@
 # Changelog
-All notable changes to this project will be documented in this file.
+
+## [0.1.0] - 2018-03-16
+### Changed
+- Convert private methods into structs with an interface (fulfiller, client and listener) that can be injected, it makes easier testing all parts of the code.
 
 ## [0.0.3] - 2018-03-07
 ### Update

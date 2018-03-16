@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-// Request is the request struct that are passed into the requests channel to be processed when a ticket is obtained.
+// Request contains the basic structure to be send into the requests channel by Queue function
 type Request struct {
-	ctx     context.Context
-	name    string
-	hreq    *http.Request
-	resChan chan *Response
-	timeout time.Duration
+	Ctx     context.Context
+	Name    string
+	HReq    *http.Request
+	ResChan chan *Response
+	Timeout time.Duration
 }
