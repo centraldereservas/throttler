@@ -57,9 +57,6 @@ func TestFulfill(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			// To Be Checked: run tests in parallel to avoid race condition because of mockSender
-			t.Parallel()
-
 			var cancel context.CancelFunc
 			called := false
 			mockSender := &MockSender{
