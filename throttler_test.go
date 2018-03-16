@@ -32,7 +32,7 @@ func (m *MockRate) CalculateRate() time.Duration {
 }
 
 func buildThrottler(rate throttler.Rate, maxCallsPerSecond int, guardTime time.Duration, requestChannelCapacity int, verbose bool, client *http.Client) (throttler.Limiter, error) {
-	limiter, err := throttler.New(rate, requestChannelCapacity, verbose, client)
+	limiter, err := throttler.New(rate, requestChannelCapacity, client, verbose)
 	if err != nil || limiter == nil {
 		return nil, fmt.Errorf("unable to create a new throttler: %v", err)
 	}
@@ -71,7 +71,7 @@ func TestNew(t *testing.T) {
 			}
 			if !foundError {
 				var client *http.Client
-				throttler, err := throttler.New(rate, tc.reqChanCapacity, false, client)
+				throttler, err := throttler.New(rate, tc.reqChanCapacity, client, false)
 				if throttler == nil {
 					checkError(tc.errMsg, err, t)
 				}
@@ -169,7 +169,7 @@ func TestQueue(t *testing.T) {
 			if err != nil {
 				t.Fatalf("unable to create a rate")
 			}
-			throttler, err := throttler.New(rate, tc.reqChanCapacity, tc.verbose, nil)
+			throttler, err := throttler.New(rate, tc.reqChanCapacity, nil, tc.verbose)
 
 			if tc.startRequestHandler {
 				throttler.Run()

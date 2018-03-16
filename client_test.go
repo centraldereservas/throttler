@@ -55,6 +55,7 @@ func TestSend(t *testing.T) {
 					return &http.Response{}, nil
 				},
 			}
+
 			sender := NewClientHandler(mockHTTPClient)
 			hreq := createHTTPRequest()
 			ctx := context.Background()

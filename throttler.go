@@ -29,7 +29,7 @@ type throttler struct {
 }
 
 // New initializes the throttler handler.
-func New(rate Rate, reqChanCapacity int, verbose bool, client *http.Client) (Limiter, error) {
+func New(rate Rate, reqChanCapacity int, client *http.Client, verbose bool) (Limiter, error) {
 	if rate == nil {
 		return nil, fmt.Errorf("rate can not be nil")
 	}

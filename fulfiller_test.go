@@ -26,7 +26,7 @@ const (
 )
 
 func createHTTPResponse(req *http.Request, body string) *http.Response {
-	resp := &http.Response{
+	return &http.Response{
 		Proto:      "HTTP/1.1",
 		ProtoMajor: 1,
 		ProtoMinor: 1,
@@ -35,13 +35,11 @@ func createHTTPResponse(req *http.Request, body string) *http.Response {
 		Request:    req,
 		StatusCode: http.StatusOK,
 	}
-	return resp
 }
 
 func createResponse(req *http.Request, body string) *Response {
-	hresp := createHTTPResponse(req, body)
 	return &Response{
-		HRes: hresp,
+		HRes: createHTTPResponse(req, body),
 		Err:  nil,
 	}
 }
@@ -59,6 +57,9 @@ func TestFulfill(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
+			// To Be Checked: run tests in parallel to avoid race condition because of mockSender
+			t.Parallel()
+
 			var cancel context.CancelFunc
 			called := false
 			mockSender := &MockSender{
@@ -88,9 +89,7 @@ func TestFulfill(t *testing.T) {
 				Timeout: 5 * time.Second,
 				ResChan: resChan,
 			}
-
 			go fulfiller.fulfill(req)
-
 			select {
 			case <-req.Ctx.Done():
 				if tc.ctxMode == contextDoneNotCalled {
@@ -109,13 +108,11 @@ func TestFulfill(t *testing.T) {
 				if !called {
 					t.Errorf("did not call client.Do")
 				}
-
-				defer resp.HRes.Body.Close()
-
 				if resp.HRes.StatusCode != http.StatusOK {
 					t.Errorf("unexpected http status: %v", resp.HRes.Status)
 				}
 
+				defer resp.HRes.Body.Close()
 				bodyBytes, err := ioutil.ReadAll(resp.HRes.Body)
 				if err != nil {
 					t.Errorf("unable to read the response body: %v", err)
